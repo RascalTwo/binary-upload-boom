@@ -22,7 +22,10 @@ module.exports = {
   },
   getPost: async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).populate('likes').populate('comments');
+      const post = await Post.findById(req.params.id).populate('likes').populate({
+        path: 'comments',
+        populate: { path: 'user' }
+      });
       const comments = post.comments
       res.render("post.ejs", { post: post, user: req.user, comments: comments });
     } catch (err) {

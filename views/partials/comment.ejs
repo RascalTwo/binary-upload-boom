@@ -1,7 +1,8 @@
 <div style="border: 1px solid black; margin-left: <%= depth * 0.5%>rem;">
 	<li class="col-6 justify-content-between mt-5">
+		<div>By: <%= comment.user.userName %></div>
 		<%= comment.deleted ? 'Deleted' : comment.text %>
-		<%if(!comment.deleted && comment.user == userId){ %>
+		<%if(!comment.deleted && comment.user._id == userId){ %>
 		<form
 			action="/comment/deleteComment/<%= postId %>/<%= comment.id %>?_method=DELETE"
 			method="POST"
