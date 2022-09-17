@@ -9,6 +9,18 @@ const CommentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",
   },
+  comment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Comment",
+  },
+}, {
+  toObject: { virtuals: true }
 });
+CommentSchema.virtual('comments', {
+  ref: 'Comment',
+  localField: '_id',
+  foreignField: 'comment'
+});
+
 
 module.exports = mongoose.model("Comment", CommentSchema);

@@ -5,10 +5,11 @@ module.exports = {
     try {
       await Comment.create({
         text: req.body.text,
-				post: req.params.id
+				post: req.params.commentId ? undefined : req.params.postId,
+        comment: req.params.commentId
       });
       console.log("Comment has been added!");
-      res.redirect("/post/" + req.params.id);
+      res.redirect("/post/" + req.params.postId);
     } catch (err) {
       console.log(err);
     }
