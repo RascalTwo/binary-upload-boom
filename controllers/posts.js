@@ -22,7 +22,7 @@ module.exports = {
   },
   getPost: async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).populate('likes').populate({ path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments' } } } } } } } } } });
+      const post = await Post.findById(req.params.id).populate('likes').populate('comments');
       const comments = post.comments
       res.render("post.ejs", { post: post, user: req.user, comments: comments });
     } catch (err) {
@@ -64,7 +64,7 @@ module.exports = {
   deletePost: async (req, res) => {
     try {
       // Find post by id
-      let post = await Post.findById({ _id: req.params.id }).populate('likes').populate({ path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments' } } } } } } } } } });
+      let post = await Post.findById({ _id: req.params.id }).populate('likes').populate('comments');
       // Delete image from cloudinary
       await cloudinary.uploader.destroy(post.cloudinaryId);
       // Delete post from db

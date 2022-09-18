@@ -24,8 +24,10 @@ const CommentSchema = new mongoose.Schema({
 CommentSchema.virtual('comments', {
   ref: 'Comment',
   localField: '_id',
-  foreignField: 'comment'
+  foreignField: 'comment',
+  autopopulate: true
 });
 
+CommentSchema.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model("Comment", CommentSchema);

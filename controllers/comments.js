@@ -17,7 +17,7 @@ module.exports = {
   },
   deleteComment: async (req, res) => {
     try {
-      const comment = await Comment.findById(req.params.commentId).populate({ path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments' } } } } } } } } } });
+      const comment = await Comment.findById(req.params.commentId).populate('comments');
       if (!comment.comments.length){
         await comment.remove()
         console.log("Comment has been deleted!");
