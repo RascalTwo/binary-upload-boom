@@ -2,8 +2,12 @@ const mongoose = require("mongoose");
 
 const CommentSchema = new mongoose.Schema({
   text: {
-    type: String,
+    type: String
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "User",
   },
   post: {
     type: mongoose.Schema.Types.ObjectId,
@@ -13,6 +17,7 @@ const CommentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
   },
+  deleted: { type: Boolean }
 }, {
   toObject: { virtuals: true }
 });

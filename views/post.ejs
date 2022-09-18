@@ -39,7 +39,7 @@
     </div>
     <ul class="row list-unstyled">
     <% for(var i=0; i<comments.length; i++) {%>
-      <%- include('partials/comment', { postId: post.id, comment: comments[i], depth: 0 }) -%>
+      <%- include('partials/comment', { postId: post.id, userId: user.id, comment: comments[i], depth: 0 }) -%>
     <% } %>
     </ul>
     <div class="col-6 mt-5">

@@ -1,5 +1,6 @@
 const cloudinary = require("../middleware/cloudinary");
 const Post = require("../models/Post");
+const Comment = require("../models/Comment");
 const Like = require("../models/Like");
 
 module.exports = {
@@ -63,10 +64,19 @@ module.exports = {
   deletePost: async (req, res) => {
     try {
       // Find post by id
-      let post = await Post.findById({ _id: req.params.id });
+      let post = await Post.findById({ _id: req.params.id }).populate('likes').populate({ path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments', populate: { path: 'comments' } } } } } } } } } });
       // Delete image from cloudinary
       await cloudinary.uploader.destroy(post.cloudinaryId);
       // Delete post from db
+      const commentIDs = [];
+      const comments = post.comments;
+      while (comments.length) {
+        const comment = comments.pop();
+        comments.push(...comment.comments);
+        commentIDs.push(comment.id);
+      }
+      await Comment.deleteMany({ _id: { $in: commentIDs}});
+      await Like.deleteMany({ post: req.params.id });
       await Post.remove({ _id: req.params.id });
       console.log("Deleted Post");
       res.redirect("/profile");

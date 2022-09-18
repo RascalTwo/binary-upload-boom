@@ -1,6 +1,15 @@
 <div style="border: 1px solid black; margin-left: <%= depth * 0.5%>rem;">
 	<li class="col-6 justify-content-between mt-5">
-		<%= comment.text %>
+		<%= comment.deleted ? 'Deleted' : comment.text %>
+		<%if(!comment.deleted && comment.user == userId){ %>
+		<form
+			action="/comment/deleteComment/<%= postId %>/<%= comment.id %>?_method=DELETE"
+			method="POST"
+			class="col-3"
+		>
+			<button class="btn btn-primary fa fa-trash" type="submit"></button>
+		</form>
+		<%}%>
 	</li>
 	<details class="mt-5">
 		<summary>Add a comment</summary>
@@ -13,6 +22,6 @@
 		</form>
 	</details>
 	<% for (const subComment of comment.comments || []) { %>
-		<%- include('comment', { postId, comment: subComment, depth: depth + 1 }) -%>
+		<%- include('comment', { postId, userId, comment: subComment, depth: depth + 1 }) -%>
 	<% } %>
 </div>
