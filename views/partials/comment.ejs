@@ -1,6 +1,6 @@
-<div style="border: 1px solid black; margin-left: <%= depth * 0.5%>rem;">
+<div style="border: 1px solid black; margin-left: <%= depth * 0.5 %>rem;">
 	<li class="col-6 justify-content-between mt-5">
-		<div>By: <%= comment.user.userName %></div>
+		<% if (!comment.deleted) { %> <div>By: <%= comment.user.userName %></div> <% } %>
 		<%= comment.deleted ? 'Deleted' : comment.text %>
 		<%if(!comment.deleted && comment.user._id == userId){ %>
 		<form
