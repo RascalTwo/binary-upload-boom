@@ -1,15 +1,43 @@
 <div style="border: 1px solid black; margin-left: <%= depth * 0.5 %>rem;">
-	<li class="col-6 justify-content-between mt-5">
+	<li class="justify-content-between mt-5">
+		<%if(!comment.deleted && comment.user._id == userId){ %>
+			<form
+				action="/comment/deleteComment/<%= postId %>/<%= comment.id %>?_method=DELETE"
+				method="POST"
+				style="float: right;"
+			>
+				<div class="btn-group" role="group" aria-label="Comment Actions">
+					<button class="btn btn-danger fa fa-trash" type="submit"></button>
+					<button type="button" class="btn btn-warning fa fa-edit" data-bs-toggle="modal" data-bs-target="#editComment-<%= comment.id %>"></button>
+				</div>
+			</form>
+		<% } %>
 		<% if (!comment.deleted) { %> <div>By: <%= comment.user.userName %></div> <% } %>
 		<%= comment.deleted ? 'Deleted' : comment.text %>
+		<!-- if comment has been edited, output a * character -->
+		<% if (comment.edited) { %> <span class="fa fa-asterisk" style="color: red;"></span> <% } %>
 		<%if(!comment.deleted && comment.user._id == userId){ %>
-		<form
-			action="/comment/deleteComment/<%= postId %>/<%= comment.id %>?_method=DELETE"
-			method="POST"
-			class="col-3"
-		>
-			<button class="btn btn-primary fa fa-trash" type="submit"></button>
-		</form>
+
+		<div class="modal fade" id="editComment-<%= comment.id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<form class="modal-content" action="/comment/editComment/<%= postId %>/<%= comment.id %>?_method=PATCH" method="POST">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Edit Comment</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+							<label for="text" class="form-label">Edited Comment</label>
+							<textarea class="form-control" id="text" name="text"><%= comment.text %></textarea>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						<button class="btn btn-primary">Update Comment</button>
+					</div>
+				</form>
+			</div>
+		</div>
 		<%}%>
 	</li>
 	<details class="mt-5">

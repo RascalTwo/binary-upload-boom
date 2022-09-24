@@ -32,4 +32,17 @@ module.exports = {
       console.log(err);
     }
   },
+  editComment: async (req, res) => {
+    try {
+      const comment = await Comment.findById(req.params.commentId);
+      comment.text = req.body.text;
+      comment.edited = true;
+      await comment.save();
+      console.log("Comment has been edited!");
+      res.redirect("/post/" + req.params.postId);
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
 };
