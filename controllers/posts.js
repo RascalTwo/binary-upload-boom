@@ -2,11 +2,12 @@ const cloudinary = require("../middleware/cloudinary");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 const Like = require("../models/Like");
+const { getPostCommentsIterative } = require("../middleware/comment");
 
 module.exports = {
   getProfile: async (req, res) => {
     try {
-      const posts = await Post.find({ user: req.user.id }).populate('likes');
+      const posts = await Post.find({ user: req.user.id })
       res.render("profile.ejs", { posts: posts, user: req.user });
     } catch (err) {
       console.log(err);
@@ -14,7 +15,7 @@ module.exports = {
   },
   getFeed: async (req, res) => {
     try {
-      const posts = await Post.find().sort({ createdAt: "desc" }).populate('likes').lean();
+      const posts = await Post.find().sort({ createdAt: "desc" }).lean();
       res.render("feed.ejs", { posts: posts });
     } catch (err) {
       console.log(err);
@@ -22,11 +23,11 @@ module.exports = {
   },
   getPost: async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).populate('likes').populate({
-        path: 'comments',
-        populate: { path: 'user' }
-      });
-      const comments = post.comments
+      const post = await Post.findById(req.params.id)
+      post.likes = await Like.countDocuments({ post: req.params.id })
+
+      const comments = await getPostCommentsIterative(post)
+
       res.render("post.ejs", { post: post, user: req.user, comments: comments });
     } catch (err) {
       console.log(err);
@@ -67,12 +68,13 @@ module.exports = {
   deletePost: async (req, res) => {
     try {
       // Find post by id
-      let post = await Post.findById({ _id: req.params.id }).populate('likes').populate('comments');
+      let post = await Post.findById({ _id: req.params.id });
+      post.likes = await Like.countDocuments({ post: req.params.id });
       // Delete image from cloudinary
       await cloudinary.uploader.destroy(post.cloudinaryId);
       // Delete post from db
       const commentIDs = [];
-      const comments = post.comments;
+      const comments = await getPostCommentsIterative(post);
       while (comments.length) {
         const comment = comments.pop();
         comments.push(...comment.comments);

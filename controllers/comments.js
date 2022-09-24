@@ -1,4 +1,5 @@
 const Comment = require("../models/Comment");
+const { getAllCommentsIterative } = require("../middleware/comment");
 
 module.exports = {
   createComment: async (req, res) => {
@@ -17,7 +18,7 @@ module.exports = {
   },
   deleteComment: async (req, res) => {
     try {
-      const comment = await Comment.findById(req.params.commentId).populate('comments');
+      const comment = await getAllCommentsIterative(...await Comment.findById(req.params.commentId))[0];
       if (!comment.comments.length){
         await comment.remove()
         console.log("Comment has been deleted!");

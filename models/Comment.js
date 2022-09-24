@@ -8,7 +8,6 @@ const CommentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "User",
-    autopopulate: true
   },
   post: {
     type: mongoose.Schema.Types.ObjectId,
@@ -23,13 +22,6 @@ const CommentSchema = new mongoose.Schema({
 }, {
   toObject: { virtuals: true }
 });
-CommentSchema.virtual('comments', {
-  ref: 'Comment',
-  localField: '_id',
-  foreignField: 'comment',
-  autopopulate: true
-});
 
-CommentSchema.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model("Comment", CommentSchema);
