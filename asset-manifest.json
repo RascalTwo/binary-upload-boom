@@ -1,9 +1,9 @@
 {
   "files": {
-    "main.css": "./static/css/main.31d6cfe0.css",
-    "main.js": "./static/js/main.086a0465.js",
-    "index.html": "./index.html",
-    "main.086a0465.js.map": "./static/js/main.086a0465.js.map"
+    "main.css": "/binary-upload-boom/static/css/main.31d6cfe0.css",
+    "main.js": "/binary-upload-boom/static/js/main.086a0465.js",
+    "index.html": "/binary-upload-boom/index.html",
+    "main.086a0465.js.map": "/binary-upload-boom/static/js/main.086a0465.js.map"
   },
   "entrypoints": [
     "static/css/main.31d6cfe0.css",
