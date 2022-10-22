@@ -25,6 +25,7 @@ const PostSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  deletedAt: { type: Date },
   edited: { type: Boolean }
 }, {
   toObject: { virtuals: true }

@@ -18,7 +18,7 @@ const CommentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
   },
-  deleted: { type: Boolean },
+  deletedAt: { type: Date },
   edited: { type: Boolean }
 }, {
   toObject: { virtuals: true }

@@ -6,7 +6,7 @@ const Like = require("../models/Like");
 module.exports = {
   getProfile: async (req, res) => {
     try {
-      const posts = await Post.find({ user: req.user.id }).populate('likes').lean();
+      const posts = await Post.find({ user: req.user.id, deletedAt: { $exists: false } }).populate('likes').lean();
       res.json(posts);
     } catch (err) {
       console.log(err);
@@ -14,7 +14,7 @@ module.exports = {
   },
   getFeed: async (req, res) => {
     try {
-      const posts = await Post.find().sort({ createdAt: "desc" }).populate('likes').lean();
+      const posts = await Post.find({ deletedAt: { $exists: false } }).sort({ createdAt: "desc" }).populate('likes').lean();
       res.json(posts);
     } catch (err) {
       console.log(err);
@@ -24,8 +24,11 @@ module.exports = {
     try {
       const post = await Post.findById(req.params.id).populate('likes').populate({
         path: 'comments',
+        match: { deletedAt: { $exists: false } },
         populate: { path: 'user' }
       })
+      if (post.deletedAt) return res.status(404).end();
+
       const comments = post.toObject().comments
       res.json({ post: post.toObject() || null, comments });
     } catch (err) {
@@ -67,7 +70,18 @@ module.exports = {
   deletePost: async (req, res) => {
     try {
       // Find post by id
-      let post = await Post.findById({ _id: req.params.id }).populate('likes').populate('comments');
+      let post = await Post.findById({ _id: req.params.id }).populate('likes').populate({
+        path: 'comments',
+        match: { deletedAt: { $exists: false } }
+      });
+
+      if (process.env.SOFT_DELETES === 'true') {
+        post.deletedAt = Date.now();
+        await post.save();
+        console.log("Post has been soft deleted!");
+        return res.json({ post });
+      }
+
       // Delete image from cloudinary
       await cloudinary.uploader.destroy(post.cloudinaryId);
       // Delete post from db
@@ -91,8 +105,10 @@ module.exports = {
     try {
       const post = await Post.findById(req.params.id).populate('likes').populate({
         path: 'comments',
+        match: { deletedAt: { $exists: false } },
         populate: { path: 'user' }
       });
+      if (post.deletedAt) return res.status(404).end();
       for (const key of ['title', 'caption']){
         if (req.body[key] === post[key]) continue;
         post[key] = req.body[key];

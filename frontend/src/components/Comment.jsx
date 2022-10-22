@@ -4,7 +4,7 @@ export default function Comment({ postId, userId, comment, depth, deleteComment,
 			<div className="accordion-item">
 				<h2 className="accordion-header" id={"viewCommentHeading-" + comment._id}>
 					<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={"#viewCommentCollapse-" + comment._id} aria-expanded="false" aria-controls={"viewCommentCollapse-" + comment._id}>
-						{comment.deleted ? 'Deleted' : <>
+						{comment.deletedAt ? 'Deleted' : <>
 							{comment.user.userName}
 							{comment.edited ? <span className="fa fa-asterisk" style={{ color: 'red' }}></span> : null}
 						</>}
@@ -13,7 +13,7 @@ export default function Comment({ postId, userId, comment, depth, deleteComment,
 				<div id={"viewCommentCollapse-" + comment._id} className="accordion-collapse collapse show" aria-labelledby={"viewCommentHeading-" + comment._id} data-bs-parent={"#viewCommentAccordian-" + comment._id}>
 					<div className="accordion-body">
 						<div className="justify-content-between">
-							{!comment.deleted && comment.user._id === userId ? <>
+							{!comment.deletedAt && comment.user._id === userId ? <>
 								<form
 									action={`/api/comment/deleteComment/${postId}/${comment._id}?_method=DELETE`}
 									method="POST"
@@ -27,8 +27,8 @@ export default function Comment({ postId, userId, comment, depth, deleteComment,
 								</form>
 							</> : null}
 
-							{comment.deleted ? null : comment.text}
-							{!comment.deleted && comment.user._id === userId ? <>
+							{comment.deletedAt ? null : comment.text}
+							{!comment.deletedAt && comment.user._id === userId ? <>
 								<div className="modal fade" id={"editComment-" + comment._id} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 									<div className="modal-dialog">
 										<form className="modal-content" action={`/api/comment/editComment/${postId}/${comment._id}?_method=PATCH`} method="POST" onSubmit={updateComment.bind(null, comment._id)}>

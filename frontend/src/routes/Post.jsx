@@ -78,12 +78,12 @@ export default function Post() {
 	const deleteComment = async (id, event) => {
 		const newComments = JSON.parse(JSON.stringify(comments));
 		const commentArrays = new Map();
-		for (const comment of newComments) commentArrays.set(comment.id, newComments);
+		for (const comment of newComments) commentArrays.set(comment._id, newComments);
 
 		const queue = [...newComments];
 		while (queue.length) {
 			const comment = queue.shift();
-			if (comment.id === id) {
+			if (comment._id === id) {
 
 				event.preventDefault();
 				const form = event.currentTarget;
@@ -116,7 +116,7 @@ export default function Post() {
 		const queue = [...newComments];
 		while (queue.length) {
 			const comment = queue.shift();
-			if (comment.id === id) {
+			if (comment._id === id) {
 				event.preventDefault();
 				const form = event.currentTarget;
 				const response = await fetch(API_BASE + form.getAttribute('action'), {
@@ -143,7 +143,7 @@ export default function Post() {
 		const queue = [...newComments];
 		while (queue.length) {
 			const comment = queue.shift();
-			if (comment.id === id) {
+			if (comment._id === id) {
 				event.preventDefault();
 				const form = event.currentTarget;
 				const response = await fetch(API_BASE + form.getAttribute('action'), {
