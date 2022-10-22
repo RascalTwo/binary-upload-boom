@@ -53,7 +53,7 @@ export function Profile() {
 								<textarea className="form-control" id="caption" name="caption"></textarea>
 							</div>
 							<div className="mb-3">
-								<label htmlFor="imgUpload" className="form-label">Image</label>
+								<label htmlFor="imgUpload" className="form-label">Media</label>
 								<input type="file" className="form-control" id="imageUpload" name="file" />
 							</div>
 							<button type="submit" className="btn btn-primary" value="Upload">Submit</button>

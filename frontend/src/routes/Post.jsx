@@ -173,7 +173,7 @@ export default function Post() {
 						{post.title}
 						{post.edited ? <span className="fa fa-asterisk" style={{ color: 'red' }}></span> : null}
 					</h2>
-					<img className="img-fluid" src={post.image} alt={post.caption} />
+					{post.media.endsWith('.mp4') ? <video src={post.media} controls alt={post.caption} ></video> : <img src={post.media} className="img-fluid" alt={post.caption}  />}
 					<div className="row justify-content-between">
 						<h3 className="col-3">Likes: {post.likes}</h3>
 						{post.user === user._id && (
@@ -200,7 +200,7 @@ export default function Post() {
 													<textarea className="form-control" id="caption" name="caption" defaultValue={post.caption}></textarea>
 												</div>
 												<div className="mb-3">
-													<label htmlFor="imgUpload" className="form-label">New Image</label>
+													<label htmlFor="imgUpload" className="form-label">New Media</label>
 													<input type="file" className="form-control" id="imageUpload" name="file" />
 												</div>
 											</div>

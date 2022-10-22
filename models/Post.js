@@ -5,7 +5,7 @@ const PostSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  image: {
+  media: {
     type: String,
     require: true,
   },

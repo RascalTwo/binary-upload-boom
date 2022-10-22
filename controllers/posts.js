@@ -38,11 +38,13 @@ module.exports = {
   createPost: async (req, res) => {
     try {
       // Upload image to cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path);
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        resource_type: "auto",
+      });
 
       const post = await Post.create({
         title: req.body.title,
-        image: result.secure_url,
+        media: result.secure_url,
         cloudinaryId: result.public_id,
         caption: req.body.caption,
         user: req.user.id,
@@ -118,8 +120,10 @@ module.exports = {
       if (req.file) {
         post.edited = true;
         await cloudinary.uploader.destroy(post.cloudinaryId);
-        const result = await cloudinary.uploader.upload(req.file.path);
-        post.image = result.secure_url;
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          resource_type: "auto",
+        });
+        post.media = result.secure_url;
         post.cloudinaryId = result.public_id;
       }
 
