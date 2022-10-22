@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   createBrowserRouter,
+  createHashRouter,
   RouterProvider,
 } from "react-router-dom";
 import './style.css';
@@ -15,7 +16,8 @@ import Logout from './routes/Logout';
 import Feed from './routes/Feed';
 import Post from './routes/Post';
 
-const router = createBrowserRouter([
+const createOurRouter = process.env.REACT_APP_HASHROUTER === 'true' ? createHashRouter : createBrowserRouter;
+const router = createOurRouter([
   {
     path: "/",
     element: <Root />,
