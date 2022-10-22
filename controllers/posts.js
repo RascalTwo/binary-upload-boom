@@ -87,4 +87,31 @@ module.exports = {
       res.redirect("/profile");
     }
   },
+  editPost: async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id).populate('likes').populate({
+        path: 'comments',
+        populate: { path: 'user' }
+      });
+      for (const key of ['title', 'caption']){
+        if (req.body[key] === post[key]) continue;
+        post[key] = req.body[key];
+        post.edited = true;
+      }
+
+      if (req.file) {
+        post.edited = true;
+        await cloudinary.uploader.destroy(post.cloudinaryId);
+        const result = await cloudinary.uploader.upload(req.file.path);
+        post.image = result.secure_url;
+        post.cloudinaryId = result.public_id;
+      }
+
+      const updatedPost = await post.save();
+      console.log("Post has been updated!");
+      res.json({ post: updatedPost.toObject() });
+    } catch (err) {
+      res.redirect("/profile");
+    }
+  }
 };

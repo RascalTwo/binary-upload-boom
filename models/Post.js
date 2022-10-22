@@ -25,6 +25,7 @@ const PostSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  edited: { type: Boolean }
 }, {
   toObject: { virtuals: true }
 });

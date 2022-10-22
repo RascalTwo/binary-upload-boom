@@ -27,9 +27,9 @@ export default function Post() {
 
 	const handleLike = async (event) => {
 		event.preventDefault();
-		const form = event.currentTarget;
-		const response = await fetch(API_BASE + form.getAttribute('action'), {
-			method: form.method,
+		const button = event.currentTarget;
+		const response = await fetch(API_BASE + button.getAttribute('action'), {
+			method: button.getAttribute('method'),
 			credentials: "include"
 		});
 		const change = await response.json();
@@ -38,12 +38,28 @@ export default function Post() {
 
 	const handleDelete = async (event) => {
 		event.preventDefault();
-		const form = event.currentTarget;
-		await fetch(API_BASE + form.getAttribute('action'), {
-			method: form.method,
+		const button = event.currentTarget;
+		await fetch(API_BASE + button.getAttribute('action'), {
+			method: button.getAttribute('method'),
 			credentials: "include"
 		});
 		navigate(-1);
+	};
+
+	const handleUpdate = async (event) => {
+		event.preventDefault();
+		const form = event.currentTarget;
+		const response = await fetch(API_BASE + form.getAttribute('action'), {
+			method: form.method,
+			body: new FormData(form),
+			credentials: "include"
+		});
+		const json = await response.json();
+		if (json.post) {
+			setPost(json.post);
+			form.reset();
+			form.querySelector('[data-bs-dismiss]').click();
+		}
 	};
 
 	const handleAddComment = async (event) => {
@@ -153,27 +169,49 @@ export default function Post() {
 		<div className="container">
 			<div className="row justify-content-center mt-5">
 				<div className="col-6">
-					<h2>{post.title}</h2>
+					<h2>
+						{post.title}
+						{post.edited ? <span className="fa fa-asterisk" style={{ color: 'red' }}></span> : null}
+					</h2>
 					<img className="img-fluid" src={post.image} alt={post.caption} />
 					<div className="row justify-content-between">
-						<form
-							className="col-1"
-							action={`/api/post/likePost/${post._id}?_method=PUT`}
-							method="POST"
-							onSubmit={handleLike}
-						>
-							<button className="btn btn-primary fa fa-heart" type="submit"></button>
-						</form>
 						<h3 className="col-3">Likes: {post.likes}</h3>
 						{post.user === user._id && (
-							<form
-								action={`/api/post/deletePost/${post._id}?_method=DELETE`}
-								method="POST"
-								className="col-3"
-								onSubmit={handleDelete}
-							>
-								<button className="btn btn-primary fa fa-trash" type="submit"></button>
-							</form>
+							<>
+								<div className="btn-group col-4" role="group" aria-label="Post Actions">
+									<button action={`/api/post/likePost/${post._id}?_method=PUT`} method="POST" className="btn btn-primary fa fa-heart" type="submit" onClick={handleLike}></button>
+									<button type="button" className="btn btn-warning fa fa-edit" data-bs-toggle="modal" data-bs-target="#editPost"></button>
+									<button action={`/api/post/deletePost/${post._id}?_method=DELETE`} method="POST" className="btn btn-danger fa fa-trash" type="submit" onClick={handleDelete}></button>
+								</div>
+								<div className="modal fade" id="editPost" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div className="modal-dialog">
+										<form className="modal-content" encType="multipart/form-data" action={`/api/post/editPost/${post.id}?_method=PATCH`} method="POST" onSubmit={handleUpdate}>
+											<div className="modal-header">
+												<h5 className="modal-title" id="exampleModalLabel">Edit Comment</h5>
+												<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+											</div>
+											<div className="modal-body">
+												<div className="mb-3">
+													<label htmlFor="title" className="form-label">Title</label>
+													<input type="text" className="form-control" id="title" name="title" defaultValue={post.title} />
+												</div>
+												<div className="mb-3">
+													<label htmlFor="caption" className="form-label">Caption</label>
+													<textarea className="form-control" id="caption" name="caption" defaultValue={post.caption}></textarea>
+												</div>
+												<div className="mb-3">
+													<label htmlFor="imgUpload" className="form-label">New Image</label>
+													<input type="file" className="form-control" id="imageUpload" name="file" />
+												</div>
+											</div>
+											<div className="modal-footer">
+												<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+												<button className="btn btn-primary">Update Post</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</>
 						)}
 					</div>
 				</div>
