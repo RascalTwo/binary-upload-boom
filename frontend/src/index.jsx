@@ -20,7 +20,7 @@ const createOurRouter = process.env.REACT_APP_HASHROUTER === 'true' ? createHash
 const router = createOurRouter([
   {
     path: "/",
-    element: <Root />,
+    element: <Root initialUser={window.r2InitialUser} />,
     errorElement: <ErrorPage />,
     children: [
       {

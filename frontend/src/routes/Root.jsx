@@ -3,15 +3,15 @@ import { Link, Outlet } from "react-router-dom";
 import Messages from '../components/Messages';
 import { API_BASE } from "../constants";
 
-export default function Root() {
-  const [user, setUser] = useState();
+export default function Root({ initialUser }) {
+  const [user, setUser] = useState(initialUser);
   const [messages, setMessages] = useState({});
 
   useEffect(() => {
-    fetch(API_BASE + '/api/user', { credentials: "include" })
+    if (user == undefined) fetch(API_BASE + '/api/user', { credentials: "include" })
       .then(res => res.json())
       .then(res => setUser(res.user));
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const listener = e => {

@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const express = require("express");
 const app = express();
@@ -28,9 +29,6 @@ app.use(cors({
   credentials: true
 }));
 
-//Static Folder
-app.use(express.static("frontend/build"));
-
 //Body Parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -58,14 +56,23 @@ app.use(passport.session());
 //Use flash messages for errors, info, ect...
 app.use(flash());
 
+function renderIndex(req, res){
+  const html = fs.readFileSync(path.join(__dirname, 'frontend/build/index.html')).toString();
+  const injectedHTML = html.replace('INITIAL_USER', JSON.stringify(req.user || null));
+  res.send(injectedHTML);
+}
+
+app.get('/', renderIndex)
+
+//Static Folder
+app.use(express.static("frontend/build"));
+
 //Setup Routes For Which The Server Is Listening
 app.use("/", mainRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 
-app.use('*', (_, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/build/index.html'));
-});
+app.use('*', renderIndex);
 
 //Server Running
 app.listen(process.env.PORT, () => {
