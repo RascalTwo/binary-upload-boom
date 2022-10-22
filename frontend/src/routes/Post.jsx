@@ -173,7 +173,7 @@ export default function Post() {
 						{post.title}
 						{post.edited ? <span className="fa fa-asterisk" style={{ color: 'red' }}></span> : null}
 					</h2>
-					{post.media.endsWith('.mp4') ? <video src={post.media} controls alt={post.caption} ></video> : <img src={post.media} className="img-fluid" alt={post.caption}  />}
+					{post.media.endsWith('.mp4') ? <video src={post.media} controls alt={post.caption} ></video> : post.media.endsWith('.mp3') ? <audio src={post.media} controls alt={post.caption} /> : <img src={post.media} className="img-fluid" alt={post.caption}  />}
 					<div className="row justify-content-between">
 						<h3 className="col-3">Likes: {post.likes}</h3>
 						{post.user === user._id && (
