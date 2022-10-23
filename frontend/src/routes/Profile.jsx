@@ -4,7 +4,7 @@ import PostList from "../components/PostList";
 import { API_BASE } from "../constants";
 
 export function Profile() {
-	const { setMessages } = useOutletContext();
+	const { user: loggedInUser, setUser: setLoggedInUser, setMessages } = useOutletContext();
 	const userIdOrName = useParams().userIdOrName;
 
 	const [user, setUser] = useState();
@@ -38,6 +38,24 @@ export function Profile() {
 		}
 	};
 
+	const isFollowing = loggedInUser.following.find(follow => follow.receiver._id === user._id)
+
+	const handleFollowUnfollow = async (event) => {
+		event.preventDefault();
+		const response = await fetch(API_BASE + `/api/follow/${isFollowing ? 'un' : ''}followUser/${user._id}`, {
+			method: isFollowing ? 'DELETE' : "POST",
+			credentials: "include"
+		});
+		const follow = await response.json()
+		if (isFollowing) {
+			setUser({ ...user, followers: user.followers.filter(f => f._id !== follow._id) });
+			setLoggedInUser({ ...loggedInUser, following: loggedInUser.following.filter(f => f._id !== follow._id) });
+		} else {
+			setUser({ ...user, followers: [...user.followers, follow] });
+			setLoggedInUser({ ...loggedInUser, following: [...loggedInUser.following, follow] });
+		}
+	}
+
 	return (
 		<div className="container">
 			<div className="row mt-5">
@@ -45,7 +63,18 @@ export function Profile() {
 					<div>
 						<p><strong>User Name</strong>: {user.userName}</p>
 						<p><strong>Email</strong>: {user.email}</p>
-						<Link to="/logout" className="col-3 btn btn-primary">Logout</Link>
+						{loggedInUser?._id === user._id
+							? <Link to="/logout" className="col-3 btn btn-primary">Logout</Link>
+							: null}
+						{loggedInUser
+							? <>
+								{loggedInUser._id !== user._id
+									? <button className="btn btn-primary" onClick={handleFollowUnfollow}>
+										{isFollowing ? 'Unfollow' : 'Follow'}
+									</button>
+									: null}
+							</>
+							: null}
 					</div>
 					<div className="mt-5">
 						<h2>Add a post</h2>
@@ -72,6 +101,22 @@ export function Profile() {
 						<Link className="btn btn-primary" to="/feed">Return to Feed</Link>
 					</div>
 				</div>
+					<div className="col-3">
+						<h2>Followers</h2>
+						<ul>
+							{user.followers.map(follow => <li key={follow._id}>
+								<Link to={`/profile/${follow.sender.userName}`}>{follow.sender.userName}</Link>
+							</li>)}
+						</ul>
+					</div>
+					<div className="col-3">
+						<h2>Following</h2>
+						<ul>
+							{user.following.map(follow => <li key={follow._id}>
+								<Link to={`/profile/${follow.receiver.userName}`}>{follow.receiver.userName}</Link>
+							</li>)}
+						</ul>
+					</div>
 			</div>
 		</div>
 	)

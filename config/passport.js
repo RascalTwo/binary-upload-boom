@@ -36,6 +36,12 @@ module.exports = function (passport) {
   });
 
   passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => done(err, user));
+    User.findById(id).populate({
+      path: "following",
+      populate: { path: 'receiver' }
+    }).populate({
+      path: "followers",
+      populate: { path: 'sender' }
+    }).then((user) => done(null, user)).catch(done);
   });
 };

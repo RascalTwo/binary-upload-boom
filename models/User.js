@@ -5,6 +5,18 @@ const UserSchema = new mongoose.Schema({
   userName: { type: String, unique: true },
   email: { type: String, unique: true },
   password: String,
+}, {
+  toObject: { virtuals: true }
+});
+UserSchema.virtual("following", {
+  ref: "Follow",
+  localField: "_id",
+  foreignField: "sender"
+});
+UserSchema.virtual("followers", {
+  ref: "Follow",
+  localField: "_id",
+  foreignField: "receiver"
 });
 
 // Password hash middleware.

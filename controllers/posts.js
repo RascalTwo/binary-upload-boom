@@ -10,11 +10,17 @@ module.exports = {
     try {
       const { userIdOrName } = req.params;
       const isObjectId = mongoose.Types.ObjectId.isValid(userIdOrName);
-      const user = await User.findOne(isObjectId ? { _id: userIdOrName } : { userName: userIdOrName});
+      const user = await User.findOne(isObjectId ? { _id: userIdOrName } : { userName: userIdOrName}).populate({
+        path: "following",
+        populate: { path: 'receiver' }
+      }).populate({
+        path: "followers",
+        populate: { path: 'sender' }
+      });
       if (!user) return res.json({ user: null, posts: [] })
 
       const posts = await Post.find({ user: user.id, deletedAt: { $exists: false } }).populate('likes').lean();
-      res.json({ user, posts });
+      res.json({ user: user.toObject(), posts });
     } catch (err) {
       console.log(err);
     }
