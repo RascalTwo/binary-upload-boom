@@ -26,8 +26,13 @@ module.exports = {
     }
   },
   getFeed: async (req, res) => {
+    const { type } = req.params;
     try {
-      const posts = await Post.find({ deletedAt: { $exists: false } }).sort({ createdAt: "desc" }).populate('likes').lean();
+      const filter = { deletedAt: { $exists: false } }
+      if (type === 'following') {
+        filter.user = { $in: req.user.following.map(follow => follow.receiver._id) }
+      }
+      const posts = await Post.find(filter).sort({ createdAt: "desc" }).populate('likes').lean();
       res.json(posts);
     } catch (err) {
       console.log(err);
