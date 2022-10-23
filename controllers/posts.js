@@ -1,4 +1,6 @@
+const mongoose = require('mongoose')
 const cloudinary = require("../middleware/cloudinary");
+const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 const Like = require("../models/Like");
@@ -6,8 +8,13 @@ const Like = require("../models/Like");
 module.exports = {
   getProfile: async (req, res) => {
     try {
-      const posts = await Post.find({ user: req.user.id, deletedAt: { $exists: false } }).populate('likes').lean();
-      res.json(posts);
+      const { userIdOrName } = req.params;
+      const isObjectId = mongoose.Types.ObjectId.isValid(userIdOrName);
+      const user = await User.findOne(isObjectId ? { _id: userIdOrName } : { userName: userIdOrName});
+      if (!user) return res.json({ user: null, posts: [] })
+
+      const posts = await Post.find({ user: user.id, deletedAt: { $exists: false } }).populate('likes').lean();
+      res.json({ user, posts });
     } catch (err) {
       console.log(err);
     }

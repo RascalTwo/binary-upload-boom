@@ -17,7 +17,7 @@ export default function Login() {
 		if (json.messages) setMessages(json.messages);
 		if (json.user) {
 			setUser(json.user);
-			navigate("/profile");
+			navigate("/profile/" + json.user.userName);
 		}
 	};
 

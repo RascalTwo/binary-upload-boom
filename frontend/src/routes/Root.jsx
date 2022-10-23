@@ -28,7 +28,7 @@ export default function Root({ initialUser }) {
     <>
       <header className="container">
         <div className="text-center">
-          <h1 className=""><Link to={user ? '/profile' : '/'}>Binary Upload Boom</Link></h1>
+          <h1 className=""><Link to={user ? '/profile/' + user.userName : '/'}>Binary Upload Boom</Link></h1>
           <span>The #100Devs Social Network</span>
         </div>
       </header>

@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 import PostList from "../components/PostList";
 import { API_BASE } from "../constants";
 
 export function Profile() {
-	const { user, setMessages } = useOutletContext();
+	const { setMessages } = useOutletContext();
+	const userIdOrName = useParams().userIdOrName;
 
+	const [user, setUser] = useState();
 	const [posts, setPosts] = useState([]);
 
 	useEffect(() => {
-		fetch(API_BASE + "/api/profile", { credentials: "include" })
+		fetch(API_BASE + "/api/profile/" + userIdOrName, { credentials: "include" })
 			.then((res) => res.json())
-			.then((data) => setPosts(data));
-	}, []);
+			.then(({ user, posts }) => {
+				setUser(user)
+				setPosts(posts);
+			});
+	}, [userIdOrName]);
 
-	if (!user) return null;
+	if (user === undefined) return null;
+	else if (!user) return <div>User not found</div>;
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();

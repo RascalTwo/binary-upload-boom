@@ -40,7 +40,7 @@ const router = createOurRouter([
         element: <Signup />,
       },
       {
-        path: "/profile",
+        path: "/profile/:userIdOrName",
         element: <Profile />,
       },
       {

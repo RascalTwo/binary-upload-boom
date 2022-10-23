@@ -2,8 +2,8 @@ const passport = require("passport");
 const validator = require("validator");
 const User = require("../models/User");
 
-exports.getUser = (req, res) => {
-  res.json({ user: req.user || null });
+exports.getUser = async (req, res) => {
+  res.json({ user: req.user?.toObject() || null });
 };
 
 exports.postLogin = (req, res, next) => {

@@ -244,7 +244,7 @@ export default function Post() {
 					))}
 				</ul>
 				<div className="col-6 mt-5">
-					<Link className="btn btn-primary" to="/profile">Return to Profile</Link>
+					<Link className="btn btn-primary" to={`/profile/` + user.userName}>Return to Profile</Link>
 					<Link className="btn btn-primary" to="/feed">Return to Feed</Link>
 				</div>
 			</div>
