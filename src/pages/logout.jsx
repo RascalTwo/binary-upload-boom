@@ -1,18 +1,14 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import useGlobals from "../context";
+import { signOut } from "next-auth/react"
 
 export default function Logout() {
-	const { setUser } = useGlobals();
 	const router = useRouter();
 
 	useEffect(() => {
-		fetch("/api/logout")
-			.then(() => {
-				setUser(null);
-				router.push("/");
-			});
-	}, [setUser, router]);
+		signOut({ redirect: false });
+		router.push("/");
+	}, [router]);
 
 	return <main className="container">
 		<div className="row justify-content-around mt-5">

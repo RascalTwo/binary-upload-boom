@@ -2,16 +2,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Messages from './components/Messages';
 import { GlobalContext } from "./context";
+import { useSession } from "next-auth/react"
 
 export default function Layout({ children }) {
-  const [user, setUser] = useState();
+  const { data: session } = useSession();
+  const user = session?.user;
   const [messages, setMessages] = useState({});
-
-  useEffect(() => {
-    if (user == undefined) fetch('/api/user')
-      .then(res => res.json())
-      .then(res => setUser(res.user));
-  }, [user]);
 
   useEffect(() => {
     const listener = e => {
@@ -33,7 +29,7 @@ export default function Layout({ children }) {
         </div>
       </header>
 			<Messages messages={messages} />
-      <GlobalContext.Provider value={{ user, setUser, setMessages }}>
+      <GlobalContext.Provider value={{ user, setMessages }}>
         {children}
       </GlobalContext.Provider>
     </>

@@ -1,24 +1,25 @@
 import { useRouter } from "next/router";
-import useGlobals from "../context";
+
+import { useSession } from "next-auth/react"
+import { signIn } from "next-auth/react"
+import { useEffect } from "react";
 
 export default function Login() {
-	const { setUser, setMessages } = useGlobals();
 	const router = useRouter();
+
+	const { data: session } = useSession()
+	const user = session?.user
+	useEffect(() => {
+		if (user) {
+			router.push("/profile/" + user.userName);
+		}
+	}, [user, router])
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const form = event.currentTarget;
-		const response = await fetch(form.getAttribute('action'), {
-			method: form.method,
-			body: new URLSearchParams(new FormData(form)),
-			credentials: "include"
-		});
-		const json = await response.json();
-		if (json.messages) setMessages(json.messages);
-		if (json.user) {
-			setUser(json.user);
-			router.push("/profile/" + json.user.userName);
-		}
+		const data = new FormData(form)
+		await signIn('credentials', { redirect: false, email: data.get('email'), password: data.get('password') })
 	};
 
 	return (
