@@ -1,27 +1,17 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Comment from '../../components/Comment'
 import useGlobals from "../../context";
+import PostModel from "../../models/Post";
+import dbConnect from "../../config/mongoose";
 
-export default function Post() {
+export default function Post({ initialPost, initialComments }) {
 	const { user } = useGlobals();
 	const router = useRouter();
-	const postId = router.query.id
 
-	const [post, setPost] = useState();
-	const [comments, setComments] = useState([]);
-
-	useEffect(() => {
-		fetch(`/api/post/${postId}`)
-			.then((res) => res.json())
-			.then(({ post, comments }) => {
-				setPost(post);
-				setComments(comments);
-			});
-	}, [setPost, postId]);
-
-	if (!user) return null;
+	const [post, setPost] = useState(initialPost);
+	const [comments, setComments] = useState(initialComments);
 
 	if (post === undefined) return null;
 	else if (post === null) return <h2>Post not found</h2>;
@@ -174,10 +164,10 @@ export default function Post() {
 						{post.title}
 						{post.edited ? <span className="fa fa-asterisk" style={{ color: 'red' }}></span> : null}
 					</h2>
-					{post.media.endsWith('.mp4') ? <video src={post.media} controls alt={post.caption} ></video> : post.media.endsWith('.mp3') ? <audio src={post.media} controls alt={post.caption} /> : <img src={post.media} className="img-fluid" alt={post.caption}  />}
+					{post.media.endsWith('.mp4') ? <video src={post.media} controls alt={post.caption} ></video> : post.media.endsWith('.mp3') ? <audio src={post.media} controls alt={post.caption} /> : <img src={post.media} className="img-fluid" alt={post.caption} />}
 					<div className="row justify-content-between">
 						<h3 className="col-3">Likes: {post.likes}</h3>
-						{post.user === user._id && (
+						{post.user === user?._id && (
 							<>
 								<div className="btn-group col-4" role="group" aria-label="Post Actions">
 									<button action={`/api/post/likePost/${post._id}?_method=PUT`} method="POST" className="btn btn-primary fa fa-heart" type="submit" onClick={handleLike}></button>
@@ -237,7 +227,7 @@ export default function Post() {
 							depth={0}
 
 							postId={post._id}
-							userId={user._id}
+							userId={user?._id}
 							deleteComment={deleteComment}
 							updateComment={updateComment}
 							addComment={addComment}
@@ -245,10 +235,37 @@ export default function Post() {
 					))}
 				</ul>
 				<div className="col-6 mt-5">
-					<Link className="btn btn-primary" href={`/profile/` + user.userName}>Return to Profile</Link>
+					<Link className="btn btn-primary" href={`/profile/` + user?.userName}>Return to Profile</Link>
 					<Link className="btn btn-primary" href="/feed">Return to Feed</Link>
 				</div>
 			</div>
 		</div>
 	)
+}
+
+
+export async function getStaticProps(context) {
+	const { id } = context.params;
+	await dbConnect();
+	const post = await PostModel.findById(id).populate('likes').populate({
+		path: 'comments',
+		match: { deletedAt: { $exists: false } },
+		populate: { path: 'user' }
+	})
+	if (!post || post.deletedAt) return { props: { initialPost: null, initialComments: [] } }
+
+	const comments = post.toObject().comments
+	return { props: JSON.parse(JSON.stringify({ initialPost: post.toObject() || null, initialComments: comments })), revalidate: 60, }
+}
+
+export async function getStaticPaths() {
+	await dbConnect();
+	const posts = await PostModel.find({ deletedAt: { $exists: false } })
+	const paths = posts.map((post) => ({
+		params: { id: post._id.toString() }
+	}))
+	return {
+		paths,
+		fallback: "blocking"
+	}
 }

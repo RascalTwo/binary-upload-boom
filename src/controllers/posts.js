@@ -38,21 +38,6 @@ const controllers = {
       console.log(err);
     }
   },
-  getPost: async (req, res) => {
-    try {
-      const post = await Post.findById(req.params.id).populate('likes').populate({
-        path: 'comments',
-        match: { deletedAt: { $exists: false } },
-        populate: { path: 'user' }
-      })
-      if (post.deletedAt) return res.status(404).end();
-
-      const comments = post.toObject().comments
-      res.json({ post: post.toObject() || null, comments });
-    } catch (err) {
-      console.log(err);
-    }
-  },
   createPost: async (req, res) => {
     try {
       // Upload image to cloudinary
